@@ -2,3 +2,4 @@ fastapi
 torch
 transformers
 uvicorn
+protobuf
