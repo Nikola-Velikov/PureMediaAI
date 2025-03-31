@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
 import torch
 import torch.nn.functional as F
 from starlette.middleware.cors import CORSMiddleware
@@ -30,8 +30,13 @@ def load_model():
         model = AutoModelForSequenceClassification.from_pretrained(model_name).to(device)
         model.eval()
 
-@app.get("/classify")
-def classify_text(text: str = Query(..., description="Text to classify")):
+
+@app.post("/classify")
+def classify_text(data: dict):
+    if "text" not in data:
+        raise HTTPException(status_code=400, detail="Missing 'text' field in request body")
+
+    text = data["text"]
     load_model()  # Load model only when needed
 
     # Tokenize input text (reduced max_length for efficiency)
